@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101827">
+  <meta name="description" content="A simple multi-currency converter with refreshable exchange rates.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon-192.png">
+  <title>Currency Compass</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand-mark" aria-hidden="true">↗</div>
+      <div class="brand-copy"><h1>Currency Compass</h1><p>One amount. Every currency.</p></div>
+      <button id="refreshBtn" class="icon-btn" aria-label="Refresh exchange rates" title="Refresh rates">↻</button>
+    </header>
+
+    <section class="rate-status" aria-live="polite">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="rateStatus">Loading exchange rates…</span>
+      <button id="settingsBtn" class="text-btn">Settings</button>
+    </section>
+
+    <section class="converter-card">
+      <div class="section-eyebrow">YOU HAVE</div>
+      <div class="base-row">
+        <label class="currency-select-wrap" for="baseCurrency">
+          <span class="flag" id="baseFlag">🇨🇦</span>
+          <select id="baseCurrency" aria-label="Base currency"></select>
+        </label>
+        <div class="amount-wrap">
+          <span class="currency-symbol" id="baseSymbol">$</span>
+          <input id="baseAmount" inputmode="decimal" type="number" min="0" step="any" value="100" aria-label="Amount to convert">
+        </div>
+      </div>
+      <div class="converter-hint">Edit the amount or change the source currency.</div>
+    </section>
+
+    <section class="results-heading">
+      <div><div class="section-eyebrow">CONVERTED AMOUNTS</div><h2>Your currencies</h2></div>
+      <button id="addBtn" class="add-btn"><span>＋</span> Add currency</button>
+    </section>
+    <section id="currencyList" class="currency-list" aria-live="polite"></section>
+
+    <footer class="footer">
+      <p id="sourceNote">Rates are indicative and may differ from your bank or card provider.</p>
+      <p>Works offline with the last saved rates. Refreshes only when online and Wi-Fi-only mode is enabled where the browser exposes connection type.</p>
+      <button id="manageBtn" class="text-btn">Manage currencies</button>
+    </footer>
+  </main>
+
+  <dialog id="currencyDialog" class="dialog">
+    <form method="dialog" id="currencyForm">
+      <div class="dialog-head"><div><div class="section-eyebrow">PERSONALIZE</div><h2 id="dialogTitle">Add a currency</h2></div><button class="icon-btn" value="cancel" aria-label="Close">×</button></div>
+      <label class="field-label" for="currencySearch">Search by name or code</label>
+      <input id="currencySearch" type="search" placeholder="Try JPY, Japanese yen…" autocomplete="off">
+      <div id="currencyChoices" class="currency-choices"></div>
+      <div class="dialog-actions"><button class="secondary-btn" value="cancel">Cancel</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="settingsDialog" class="dialog small-dialog">
+    <form method="dialog">
+      <div class="dialog-head"><div><div class="section-eyebrow">PREFERENCES</div><h2>Rate settings</h2></div><button class="icon-btn" value="cancel" aria-label="Close">×</button></div>
+      <label class="setting-row"><span><strong>Wi-Fi only</strong><small>Do not fetch rates on mobile data when the browser reports the connection type.</small></span><input id="wifiOnly" type="checkbox" checked></label>
+      <label class="setting-row"><span><strong>Automatic refresh</strong><small>Refresh on launch and every 6 hours while the app is open and online.</small></span><input id="autoRefresh" type="checkbox" checked></label>
+      <p class="settings-note">Browsers do not reliably expose Wi-Fi status on every device. When the connection type is unknown, Wi-Fi-only mode avoids automatic refreshes; you can still refresh manually.</p>
+      <div class="dialog-actions"><button class="primary-btn" value="close">Done</button></div>
+    </form>
+  </dialog>
+
+  <script src="./app.js"></script>
+</body>
+</html>
