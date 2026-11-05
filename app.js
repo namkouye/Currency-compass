@@ -74,6 +74,41 @@ $("wifiOnly").addEventListener("change",e=>{settings.wifiOnly=e.target.checked;s
 $("autoRefresh").addEventListener("change",e=>{settings.autoRefresh=e.target.checked;saveState();});
 window.addEventListener("online",()=>{if(settings.autoRefresh)refreshRates(false);});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&settings.autoRefresh){const last=ratesCache?.time_last_update_unix?ratesCache.time_last_update_unix*1000:0;if(Date.now()-last>6*60*60*1000)refreshRates(false);}});
-if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"))window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+// PWA update flow: keep the installed home-screen app, and offer in-app updates.
+let waitingWorker = null;
+let refreshingForUpdate = false;
+function showUpdateAvailable(worker){
+  waitingWorker = worker;
+  $("updateBanner").hidden = false;
+}
+if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost")){
+  window.addEventListener("load",async()=>{
+    try{
+      const registration=await navigator.serviceWorker.register("./sw.js",{updateViaCache:"none"});
+      if(registration.waiting && navigator.serviceWorker.controller) showUpdateAvailable(registration.waiting);
+      registration.addEventListener("updatefound",()=>{
+        const installing=registration.installing;
+        if(!installing)return;
+        installing.addEventListener("statechange",()=>{
+          if(installing.state==="installed" && navigator.serviceWorker.controller) showUpdateAvailable(installing);
+        });
+      });
+      // Ask the host for a new worker when the app is opened or revisited.
+      registration.update().catch(()=>{});
+      document.addEventListener("visibilitychange",()=>{
+        if(!document.hidden) registration.update().catch(()=>{});
+      });
+    }catch(error){console.warn("Service worker registration failed",error);}
+  });
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{
+    if(refreshingForUpdate)return;
+    refreshingForUpdate=true;
+    window.location.reload();
+  });
+}
+$("updateBtn").addEventListener("click",()=>{
+  if(waitingWorker) waitingWorker.postMessage({type:"SKIP_WAITING"});
+});
+$("dismissUpdateBtn").addEventListener("click",()=>{$("updateBanner").hidden=true;});
 renderList();
 if(!ratesCache){setStatus("Loading exchange rates…");refreshRates(false);}else{setStatus(`Saved rates · last updated ${formatDate(ratesCache.time_last_update_utc)}`,"good");if(settings.autoRefresh)refreshRates(false);}

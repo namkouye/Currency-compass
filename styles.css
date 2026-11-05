@@ -13,3 +13,11 @@ button,input,select{font:inherit}button{cursor:pointer}.app-shell{width:min(780p
 .currency-input:focus{color:var(--accent2)}
 .currency-input::-webkit-inner-spin-button{appearance:none}
 @media(max-width:440px){.currency-input-wrap{min-width:95px;max-width:44%}.currency-input{font-size:18px}.editable-currency{gap:8px}}
+
+.update-banner{display:flex;align-items:center;gap:12px;padding:13px 14px;margin:-6px 0 17px;border:1px solid #3b806d;background:#14332f;border-radius:13px}
+.update-banner[hidden]{display:none}
+.update-copy{display:grid;gap:3px;flex:1;min-width:0}
+.update-copy strong{font-size:12px;color:#c9f8e6}
+.update-copy span{font-size:11px;color:#a4c8bc}
+.update-btn{border:0;border-radius:9px;background:#83e0c0;color:#0b2925;font-size:11px;font-weight:800;padding:9px 11px;white-space:nowrap}
+.dismiss-update{border:0;background:transparent;color:#a4c8bc;font-size:20px;padding:2px 4px}

@@ -46,3 +46,18 @@ Then visit `http://localhost:8000`.
 - `manifest.webmanifest` — installable PWA metadata
 - `sw.js` — app-shell offline cache
 - `icons/` — app icons
+
+
+## App updates (version 1.1.0)
+
+The app is configured to update itself after you publish a new version to the same GitHub Pages URL:
+
+1. Change `APP_VERSION` in `sw.js` for every release (for example `1.1.0` → `1.1.1`).
+2. Upload/commit the updated project files to the same GitHub repository and branch.
+3. GitHub Pages publishes the new files at the same URL.
+4. The installed app checks for a new service worker when it opens and when it returns to the foreground.
+5. If an update is found, it displays an in-app **Mettre à jour** prompt. Tapping it activates the new version and reloads the app.
+
+You do **not** need to send the URL to your phone again or recreate the home-screen icon. The installed icon continues to point to the same web app address. The app must connect to the internet to discover and download a release; the previous cached version remains available offline until the update is installed.
+
+Note: browser and operating-system policies control update-check timing. The app checks on launch/return, but cannot guarantee an instantaneous update while fully closed or offline. Keep the GitHub Pages URL, manifest `start_url`, and scope stable between releases.
