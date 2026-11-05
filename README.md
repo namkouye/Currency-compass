@@ -1,5 +1,7 @@
 # Currency Compass PWA
 
+Current app version: **1.1.1**.
+
 A small, installable multi-currency converter. Default currencies: CAD, EUR, USD and GBP. Add other currencies with **Add currency**.
 
 ## Features
@@ -61,3 +63,8 @@ The app is configured to update itself after you publish a new version to the sa
 You do **not** need to send the URL to your phone again or recreate the home-screen icon. The installed icon continues to point to the same web app address. The app must connect to the internet to discover and download a release; the previous cached version remains available offline until the update is installed.
 
 Note: browser and operating-system policies control update-check timing. The app checks on launch/return, but cannot guarantee an instantaneous update while fully closed or offline. Keep the GitHub Pages URL, manifest `start_url`, and scope stable between releases.
+
+
+## Release updates
+
+For each release, increment `APP_VERSION` in `sw.js` and publish the updated project files to the same GitHub Pages repository and URL. Installed apps check for updates when opened or brought back to the foreground.

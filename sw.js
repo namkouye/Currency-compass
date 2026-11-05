@@ -1,4 +1,4 @@
-const APP_VERSION = "1.1.0";
+const APP_VERSION = "1.1.1";
 const CACHE_NAME = `currency-compass-${APP_VERSION}`;
 const APP_FILES = [
   "./",
