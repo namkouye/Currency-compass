@@ -25,22 +25,12 @@
     </section>
 
     <section class="converter-card">
-      <div class="section-eyebrow">YOU HAVE</div>
-      <div class="base-row">
-        <label class="currency-select-wrap" for="baseCurrency">
-          <span class="flag" id="baseFlag">🇨🇦</span>
-          <select id="baseCurrency" aria-label="Base currency"></select>
-        </label>
-        <div class="amount-wrap">
-          <span class="currency-symbol" id="baseSymbol">$</span>
-          <input id="baseAmount" inputmode="decimal" type="number" min="0" step="any" value="100" aria-label="Amount to convert">
-        </div>
-      </div>
-      <div class="converter-hint">Edit the amount or change the source currency.</div>
+      <div class="section-eyebrow">YOUR CURRENCIES</div>
+      <div class="converter-hint">Enter an amount in any row. Every other currency updates instantly.</div>
     </section>
 
     <section class="results-heading">
-      <div><div class="section-eyebrow">CONVERTED AMOUNTS</div><h2>Your currencies</h2></div>
+      <div><div class="section-eyebrow">LIVE CONVERSION</div><h2>Your currencies</h2></div>
       <button id="addBtn" class="add-btn"><span>＋</span> Add currency</button>
     </section>
     <section id="currencyList" class="currency-list" aria-live="polite"></section>

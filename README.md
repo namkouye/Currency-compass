@@ -4,7 +4,7 @@ A small, installable multi-currency converter. Default currencies: CAD, EUR, USD
 
 ## Features
 
-- Edit an amount in the selected source currency; all selected currencies recalculate immediately.
+- Enter an amount directly in any currency row; that row becomes the reference and all other rows recalculate immediately. Switch conversion direction simply by typing in a different row.
 - Add/remove currencies from a built-in list of common currencies.
 - Refresh exchange rates on demand; automatic refresh on launch/return to the app and approximately every 6 hours while open.
 - Stores the latest rate table locally, so conversions can still work offline using the last saved rates.
