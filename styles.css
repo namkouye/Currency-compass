@@ -36,3 +36,8 @@ button,input,select{font:inherit}button{cursor:pointer}.app-shell{width:min(780p
 .currency-row-shell.is-dragging .currency-card{transform:scale(1.025);border-color:var(--accent);box-shadow:0 12px 30px #0006;}
 .currency-row-shell.is-dragging,.currency-row-shell.is-dragging *{cursor:grabbing;user-select:none;-webkit-user-select:none}
 @media(prefers-reduced-motion:reduce){.currency-row-shell .currency-card{transition:none}}
+
+/* Dedicated, reliable reorder grip: vertical touch movement is reserved for dragging. */
+.drag-handle{width:22px;min-width:22px;padding:0;border:0;background:transparent;color:#71859d;font-size:21px;line-height:1;display:grid;place-items:center;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;}
+.drag-handle:active{color:var(--accent2)}
+.currency-row-shell.is-dragging{z-index:10;}

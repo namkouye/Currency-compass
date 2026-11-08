@@ -30,6 +30,7 @@ function renderList(keepCode=null, caret=null){
    const trash=document.createElement("button");trash.type="button";trash.className="swipe-delete";trash.title=`Remove ${c.code}`;trash.setAttribute("aria-label",`Remove ${c.code}`);trash.innerHTML='<span aria-hidden="true">&#128465;</span>';
    trash.addEventListener("click",()=>{selected=selected.filter(x=>x!==code);if(anchor===code){anchor=selected[0]||"CAD";amount=anchor===code?"0":amount;}saveState();renderList();});
    const row=document.createElement("article");row.className="currency-card editable-currency";row.dataset.code=code;
+   const handle=document.createElement("button");handle.type="button";handle.className="drag-handle";handle.setAttribute("aria-label",`Move ${c.code}`);handle.title="Hold and drag to reorder";handle.textContent="⠿";
    const flag=document.createElement("div");flag.className="currency-flag";flag.textContent=c.flag;
    const meta=document.createElement("div");meta.className="currency-meta";
    const codeLine=document.createElement("div");codeLine.className="currency-code";codeLine.textContent=c.code;
@@ -43,43 +44,46 @@ function renderList(keepCode=null, caret=null){
    wrap.append(symbol,input);
    const reset=document.createElement("button");reset.type="button";reset.className="reset-btn";reset.title=`Reset ${c.code} amount`;reset.setAttribute("aria-label",`Reset ${c.code} amount`);reset.textContent="×";
    reset.addEventListener("click",()=>{anchor=code;amount="0";saveState();renderList();});
-   row.append(flag,meta,wrap,reset);shell.append(trash,row);host.append(shell);
-   addRowGestures(shell,row);
+   row.append(handle,flag,meta,wrap,reset);shell.append(trash,row);host.append(shell);
+   addRowGestures(shell,row,handle);
  });
  if(keepCode){const row=[...host.querySelectorAll('.currency-card')].find(el=>el.dataset.code===keepCode);const input=row?.querySelector("input");if(input){input.focus();try{input.setSelectionRange(caret,caret)}catch{}}}
 }
 
-// Swipe left to reveal delete; long-press and drag vertically to reorder.
-function addRowGestures(shell,row){
- let startX=0,startY=0,lastX=0,lastY=0,pressTimer=null,dragging=false,moved=false;
- const clearPress=()=>{if(pressTimer){clearTimeout(pressTimer);pressTimer=null;}};
+// Robust touch gestures: swipe on the row; reorder using the dedicated grip.
+function addRowGestures(shell,row,handle){
+ let sx=0,sy=0,swiping=false;
  shell.addEventListener("pointerdown",e=>{
-   if(e.target.closest('input,button'))return;
-   startX=lastX=e.clientX;startY=lastY=e.clientY;moved=false;dragging=false;
-   pressTimer=setTimeout(()=>{
-     dragging=true;shell.classList.add('is-dragging');
-     document.querySelectorAll('.currency-row-shell.is-revealed').forEach(el=>el.classList.remove('is-revealed'));
-     if(navigator.vibrate)navigator.vibrate(25);
-   },420);
+   if(e.target.closest('input,button,.drag-handle'))return;
+   sx=e.clientX;sy=e.clientY;swiping=true;
  });
  shell.addEventListener("pointermove",e=>{
-   lastX=e.clientX;lastY=e.clientY;
-   if(Math.abs(lastX-startX)>12||Math.abs(lastY-startY)>12)moved=true;
-   if(dragging){
-     e.preventDefault();
-     const siblings=[...$('currencyList').children].filter(el=>el!==shell);
-     const target=siblings.find(el=>{const r=el.getBoundingClientRect();return lastY>=r.top&&lastY<=r.bottom;});
-     if(target){const r=target.getBoundingClientRect();if(lastY<r.top+r.height/2)target.before(shell);else target.after(shell);}
-   }else if(Math.abs(lastX-startX)>38&&Math.abs(lastX-startX)>Math.abs(lastY-startY)*1.25){
-     clearPress();if(lastX<startX){document.querySelectorAll('.currency-row-shell.is-revealed').forEach(el=>{if(el!==shell)el.classList.remove('is-revealed')});shell.classList.add('is-revealed');}else if(shell.classList.contains('is-revealed'))shell.classList.remove('is-revealed');
+   if(!swiping)return;
+   const dx=e.clientX-sx,dy=e.clientY-sy;
+   if(Math.abs(dx)>18&&Math.abs(dx)>Math.abs(dy)*1.15){
+     swiping=false;
+     document.querySelectorAll('.currency-row-shell.is-revealed').forEach(el=>{if(el!==shell)el.classList.remove('is-revealed')});
+     if(dx<0)shell.classList.add('is-revealed');else shell.classList.remove('is-revealed');
    }
  });
- const finish=()=>{
-   clearPress();
-   if(dragging){dragging=false;shell.classList.remove('is-dragging');selected=[...$('currencyList').children].map(el=>el.dataset.code);saveState();}
- };
- shell.addEventListener('pointerup',finish);shell.addEventListener('pointercancel',finish);
+ const stopSwipe=()=>{swiping=false;};
+ shell.addEventListener('pointerup',stopSwipe);shell.addEventListener('pointercancel',stopSwipe);
  shell.addEventListener('click',e=>{if(!e.target.closest('button,input')&&shell.classList.contains('is-revealed'))shell.classList.remove('is-revealed')});
+
+ let timer=null,dragging=false,lastY=0,moved=false;
+ const clear=()=>{if(timer){clearTimeout(timer);timer=null;}};
+ handle.addEventListener('pointerdown',e=>{
+   e.preventDefault();lastY=e.clientY;moved=false;dragging=false;
+   handle.setPointerCapture?.(e.pointerId);
+   timer=setTimeout(()=>{dragging=true;shell.classList.add('is-dragging');if(navigator.vibrate)navigator.vibrate(25);},260);
+ });
+ handle.addEventListener('pointermove',e=>{
+   if(!timer&&!dragging)return;
+   if(Math.abs(e.clientY-lastY)>5)moved=true;
+   if(dragging){e.preventDefault();const siblings=[...$('currencyList').children].filter(el=>el!==shell);const target=siblings.find(el=>{const r=el.getBoundingClientRect();return e.clientY>=r.top&&e.clientY<=r.bottom;});if(target){const r=target.getBoundingClientRect();if(e.clientY<r.top+r.height/2)target.before(shell);else target.after(shell);}}
+ });
+ const finish=()=>{clear();if(dragging){dragging=false;shell.classList.remove('is-dragging');selected=[...$('currencyList').children].map(el=>el.dataset.code);saveState();} };
+ handle.addEventListener('pointerup',finish);handle.addEventListener('pointercancel',finish);handle.addEventListener('lostpointercapture',finish);
 }
 
 async function refreshRates(manual=false){

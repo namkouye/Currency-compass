@@ -1,6 +1,6 @@
 # Currency Compass PWA
 
-Current app version: **1.2.0**.
+Current app version: **1.3.0**.
 
 A small, installable multi-currency converter. Default currencies: CAD, EUR, USD and GBP. Add other currencies with **Add currency**.
 
@@ -51,11 +51,11 @@ Then visit `http://localhost:8000`.
 - `icons/` — app icons
 
 
-## App updates (version 1.2.0)
+## App updates (version 1.3.0)
 
 The app is configured to update itself after you publish a new version to the same GitHub Pages URL:
 
-1. Change `APP_VERSION` in `sw.js` for every release (for example `1.1.1` → `1.2.0`).
+1. Change `APP_VERSION` in `sw.js` for every release (for example `1.1.1` → `1.3.0`).
 2. Upload/commit the updated project files to the same GitHub repository and branch.
 3. GitHub Pages publishes the new files at the same URL.
 4. The installed app checks for a new service worker when it opens and when it returns to the foreground.
@@ -69,3 +69,8 @@ Note: browser and operating-system policies control update-check timing. The app
 ## Release updates
 
 For each release, increment `APP_VERSION` in `sw.js` and publish the updated project files to the same GitHub Pages repository and URL. Installed apps check for updates when opened or brought back to the foreground.
+
+
+### Gestes tactiles (v1.3.0)
+- Balayer horizontalement une ligne vers la gauche pour révéler la suppression.
+- Utiliser la poignée ⠿ à gauche de chaque devise : maintenir environ 0,26 seconde puis glisser verticalement pour réordonner. La poignée dédiée évite de bloquer le défilement normal de la page.
