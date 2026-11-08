@@ -26,7 +26,10 @@ function renderList(keepCode=null, caret=null){
  const host=$("currencyList");host.innerHTML="";
  if(!selected.length){host.innerHTML='<div class="empty-state">Add a currency to get started.</div>';return;}
  selected.forEach(code=>{
-   const c=currency(code), row=document.createElement("article");row.className="currency-card editable-currency";
+   const c=currency(code), shell=document.createElement("div");shell.className="currency-row-shell";shell.dataset.code=code;
+   const trash=document.createElement("button");trash.type="button";trash.className="swipe-delete";trash.title=`Remove ${c.code}`;trash.setAttribute("aria-label",`Remove ${c.code}`);trash.innerHTML='<span aria-hidden="true">&#128465;</span>';
+   trash.addEventListener("click",()=>{selected=selected.filter(x=>x!==code);if(anchor===code){anchor=selected[0]||"CAD";amount=anchor===code?"0":amount;}saveState();renderList();});
+   const row=document.createElement("article");row.className="currency-card editable-currency";row.dataset.code=code;
    const flag=document.createElement("div");flag.className="currency-flag";flag.textContent=c.flag;
    const meta=document.createElement("div");meta.className="currency-meta";
    const codeLine=document.createElement("div");codeLine.className="currency-code";codeLine.textContent=c.code;
@@ -36,18 +39,49 @@ function renderList(keepCode=null, caret=null){
    const input=document.createElement("input");input.className="currency-input";input.type="number";input.inputMode="decimal";input.min="0";input.step="any";input.setAttribute("aria-label",`Amount in ${c.code}`);
    const rate=rateBetween(anchor,code), n=Number(amount);
    input.value=code===anchor?amount:(rate&&amount!==""&&Number.isFinite(n)?(n*rate).toFixed(2):"");
-   input.addEventListener("input",()=>{
-     anchor=code;amount=input.value;saveState();
-     const pos=input.selectionStart;
-     renderList(code,pos);
-   });
+   input.addEventListener("input",()=>{anchor=code;amount=input.value;saveState();const pos=input.selectionStart;renderList(code,pos);});
    wrap.append(symbol,input);
-   const remove=document.createElement("button");remove.className="remove-btn";remove.title=`Remove ${c.code}`;remove.setAttribute("aria-label",`Remove ${c.code}`);remove.textContent="×";
-   remove.addEventListener("click",()=>{selected=selected.filter(x=>x!==code);if(anchor===code)anchor=selected[0]||"CAD";saveState();renderList();});
-   row.append(flag,meta,wrap,remove);host.append(row);
+   const reset=document.createElement("button");reset.type="button";reset.className="reset-btn";reset.title=`Reset ${c.code} amount`;reset.setAttribute("aria-label",`Reset ${c.code} amount`);reset.textContent="×";
+   reset.addEventListener("click",()=>{anchor=code;amount="0";saveState();renderList();});
+   row.append(flag,meta,wrap,reset);shell.append(trash,row);host.append(shell);
+   addRowGestures(shell,row);
  });
- if(keepCode){const row=[...host.children].find(el=>el.querySelector(".currency-code")?.textContent===keepCode);const input=row?.querySelector("input");if(input){input.focus();try{input.setSelectionRange(caret,caret)}catch{}}}
+ if(keepCode){const row=[...host.querySelectorAll('.currency-card')].find(el=>el.dataset.code===keepCode);const input=row?.querySelector("input");if(input){input.focus();try{input.setSelectionRange(caret,caret)}catch{}}}
 }
+
+// Swipe left to reveal delete; long-press and drag vertically to reorder.
+function addRowGestures(shell,row){
+ let startX=0,startY=0,lastX=0,lastY=0,pressTimer=null,dragging=false,moved=false;
+ const clearPress=()=>{if(pressTimer){clearTimeout(pressTimer);pressTimer=null;}};
+ shell.addEventListener("pointerdown",e=>{
+   if(e.target.closest('input,button'))return;
+   startX=lastX=e.clientX;startY=lastY=e.clientY;moved=false;dragging=false;
+   pressTimer=setTimeout(()=>{
+     dragging=true;shell.classList.add('is-dragging');
+     document.querySelectorAll('.currency-row-shell.is-revealed').forEach(el=>el.classList.remove('is-revealed'));
+     if(navigator.vibrate)navigator.vibrate(25);
+   },420);
+ });
+ shell.addEventListener("pointermove",e=>{
+   lastX=e.clientX;lastY=e.clientY;
+   if(Math.abs(lastX-startX)>12||Math.abs(lastY-startY)>12)moved=true;
+   if(dragging){
+     e.preventDefault();
+     const siblings=[...$('currencyList').children].filter(el=>el!==shell);
+     const target=siblings.find(el=>{const r=el.getBoundingClientRect();return lastY>=r.top&&lastY<=r.bottom;});
+     if(target){const r=target.getBoundingClientRect();if(lastY<r.top+r.height/2)target.before(shell);else target.after(shell);}
+   }else if(Math.abs(lastX-startX)>38&&Math.abs(lastX-startX)>Math.abs(lastY-startY)*1.25){
+     clearPress();if(lastX<startX){document.querySelectorAll('.currency-row-shell.is-revealed').forEach(el=>{if(el!==shell)el.classList.remove('is-revealed')});shell.classList.add('is-revealed');}else if(shell.classList.contains('is-revealed'))shell.classList.remove('is-revealed');
+   }
+ });
+ const finish=()=>{
+   clearPress();
+   if(dragging){dragging=false;shell.classList.remove('is-dragging');selected=[...$('currencyList').children].map(el=>el.dataset.code);saveState();}
+ };
+ shell.addEventListener('pointerup',finish);shell.addEventListener('pointercancel',finish);
+ shell.addEventListener('click',e=>{if(!e.target.closest('button,input')&&shell.classList.contains('is-revealed'))shell.classList.remove('is-revealed')});
+}
+
 async function refreshRates(manual=false){
  if(!navigator.onLine){setStatus("Offline · using saved rates",ratesCache?"":"bad");return;}
  if(!manual&&settings.wifiOnly&&!canAutoFetch()){setStatus("Auto-refresh paused · Wi-Fi not confirmed",ratesCache?"":"");return;}

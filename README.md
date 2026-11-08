@@ -1,12 +1,13 @@
 # Currency Compass PWA
 
-Current app version: **1.1.1**.
+Current app version: **1.2.0**.
 
 A small, installable multi-currency converter. Default currencies: CAD, EUR, USD and GBP. Add other currencies with **Add currency**.
 
 ## Features
 
 - Enter an amount directly in any currency row; that row becomes the reference and all other rows recalculate immediately. Switch conversion direction simply by typing in a different row.
+- Tap the × on a currency row to reset its amount to zero; swipe left to reveal the red delete action; long-press and drag a row to reorder currencies.
 - Add/remove currencies from a built-in list of common currencies.
 - Refresh exchange rates on demand; automatic refresh on launch/return to the app and approximately every 6 hours while open.
 - Stores the latest rate table locally, so conversions can still work offline using the last saved rates.
@@ -50,11 +51,11 @@ Then visit `http://localhost:8000`.
 - `icons/` — app icons
 
 
-## App updates (version 1.1.0)
+## App updates (version 1.2.0)
 
 The app is configured to update itself after you publish a new version to the same GitHub Pages URL:
 
-1. Change `APP_VERSION` in `sw.js` for every release (for example `1.1.0` → `1.1.1`).
+1. Change `APP_VERSION` in `sw.js` for every release (for example `1.1.1` → `1.2.0`).
 2. Upload/commit the updated project files to the same GitHub repository and branch.
 3. GitHub Pages publishes the new files at the same URL.
 4. The installed app checks for a new service worker when it opens and when it returns to the foreground.

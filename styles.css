@@ -21,3 +21,18 @@ button,input,select{font:inherit}button{cursor:pointer}.app-shell{width:min(780p
 .update-copy span{font-size:11px;color:#a4c8bc}
 .update-btn{border:0;border-radius:9px;background:#83e0c0;color:#0b2925;font-size:11px;font-weight:800;padding:9px 11px;white-space:nowrap}
 .dismiss-update{border:0;background:transparent;color:#a4c8bc;font-size:20px;padding:2px 4px}
+
+
+/* Currency row actions: reset, swipe-to-delete, and long-press sorting */
+.currency-list{overflow:visible}
+.currency-row-shell{position:relative;min-width:0;border-radius:16px;touch-action:pan-y;}
+.currency-row-shell .currency-card{position:relative;z-index:1;transition:transform .2s ease,border-color .15s;will-change:transform;}
+.reset-btn{width:28px;height:28px;flex:0 0 28px;border:0;border-radius:8px;background:transparent;color:#71859d;font-size:21px;line-height:1;display:grid;place-items:center;}
+.reset-btn:hover{color:var(--accent2);background:#203a3b}
+.swipe-delete{position:absolute;right:0;top:0;bottom:0;width:76px;border:0;border-radius:0 16px 16px 0;background:#c93645;color:white;font-size:25px;display:grid;place-items:center;}
+.swipe-delete span{font-size:25px;filter:grayscale(1) brightness(0) invert(1)}
+.currency-row-shell.is-revealed .currency-card{transform:translateX(-76px)}
+.currency-row-shell.is-dragging{z-index:5;opacity:.88;}
+.currency-row-shell.is-dragging .currency-card{transform:scale(1.025);border-color:var(--accent);box-shadow:0 12px 30px #0006;}
+.currency-row-shell.is-dragging,.currency-row-shell.is-dragging *{cursor:grabbing;user-select:none;-webkit-user-select:none}
+@media(prefers-reduced-motion:reduce){.currency-row-shell .currency-card{transition:none}}
